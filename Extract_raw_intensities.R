@@ -1,5 +1,5 @@
-## Functions
-```{r functions}
+
+## ----functions-----------------------------------------------------------
 # tests if library installed: if yes, loads library; if no, installs library
 pkgTest <- function(x)  {
     if (!require(x,character.only = TRUE))
@@ -9,42 +9,18 @@ pkgTest <- function(x)  {
         if(!require(x,character.only = TRUE)) stop("Package not found")
     }
   }
-```
 
-## Libraries
 
-```{r libraries}
+## ----libraries-----------------------------------------------------------
 pkgTest("reshape")
 pkgTest("plyr")
 pkgTest("aroma.affymetrix")
 require(reshape)
 require(plyr)
 require(aroma.affymetrix)
-```
 
-## Variables
 
-The aroma.affymetrix and this script library is very fussy about directory structure!
-
-Affymetrix SNP 6 annotation file must be in the correct directory (annotationData) under the current working directory (getwd()). 
-Like this:
-    baseDir
-      └── annotationData/
-          └── chipTypes
-              └── GenomeWideSNP_6.Full
-                  └── GenomeWideSNP_6.Full.cdf
-            
-This script will search for raw data (CEL files) in the "CELfiles" subdirectory of the rawData directory under the current working directory. 
-
-    baseDir
-      └── rawData
-          └──rawintensities
-          └── CELfiles
-              └── foo.CEL
-              
-Note that while it is possible to process all the CEL files at once, the process is very memory intensive, so this script processes the CEL files one at a time. 
-
-```{r variables}
+## ----variables-----------------------------------------------------------
 # the base of the aroma.affymetrix directory structure
 baseDir <- "/Volumes/2TB/backups/Broad_backup/pipeline" # change this to match your own basedirectory
 if(!file.exists(file.path(baseDir, "rawData", "CELfiles"))){
@@ -55,12 +31,9 @@ if(!file.exists(file.path(baseDir, "annotationData", "chipTypes", "GenomeWideSNP
   print("No Affy6 library (cdf) file or in incorrect directory")
   q()                                                                                                                       }
 setwd(baseDir)
-```
 
-## Annotations
- - loads in probe annotations for the Affy 6 array
 
-```{r annotations}
+## ----annotations---------------------------------------------------------
 # load in probe annotations, detailing allele identities of the "A" and "B" probesetIDs
 A.B.probe.annots <- read.table(file.path(baseDir, "annotationData", "simplified.annot.A.B.hg18.tab"), header=T, sep="\t")
 # reformat annotations and label
@@ -71,11 +44,9 @@ names(A.B.probe.annots.m) <- c("probeset", "alleleID", "allele")
 cdf <- AffymetrixCdfFile$byChipType("GenomeWideSNP_6.Full") 
 # extract the indices of all SNP probes
 SNPprobe.indices <- grep("SNP_A", getUnitNames(cdf))
-```
 
-## Process arrays and write to file
 
-```{r process}
+## ----process-------------------------------------------------------------
 # list CEL files
 celfiles <- list.files(file.path(baseDir, "rawData", "CELfiles"), pattern="CEL|cel" )
 
@@ -97,17 +68,5 @@ sapply(celfiles, function(celfile) {
   data <- cast(intensities.median, probesetID ~ sample, value="x")
   write.table(data, file=file.path(baseDir, "rawData", "rawintensities", paste("raw", celfile, "tab", sep=".")))
   })
-```
 
 
-Terminology (these are not the most consistent)
-Probe - refers to an individual instance of a probe on the array for a particular SNP and allele, there are multiple probes with identical properties and targets placed across the array
-Probeset - summarized group of probes against a particular SNP
-i.e. SNP_A-1780415
-
-ProbesetID - group of probes against a particular SNP AND allele
-SNP_A-1780415_A
-or 
-SNP_A-1780415_B
-
-alleleID - the A or B on the end of the probesetID
