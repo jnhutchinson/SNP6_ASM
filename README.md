@@ -13,13 +13,10 @@ python extract.probe.intensities.py -h for help
 optional arguments:
   -h, --help            show this help message and exit
 
-required arguments:
-     -c CELDIR, --CELdir CELDIR  
-                           directory containing CEL files  
-     -a APTDIR, --aptdir APTDIR  
-                           directory containing apt-cel-extract binary  
-     -d CDFFILE, --CDFfile CDFFILE  
-                           full path to CDF file for AffySNP6 chip  
+required arguments:  
+     -c/--CELdir : directory containing CEL files  
+     -a/--aptdir : directory containing apt-cel-extract binary  
+     -d/--CDFfile : full path to CDF file for AffySNP6 chip  
 
 Make sure all your CEL file extensions are in UPPERCASE
 
