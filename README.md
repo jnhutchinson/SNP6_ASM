@@ -2,13 +2,18 @@
 
 Scripts for calling Allele specific methylation from Affymetrix SNP6.0 arrays.
 
+--- 
+
 ##Requirements
 Affymetrix SNP6.0 library (cdf) file - download from [Netaffx](http://www.affymetrix.com/analysis/index.affx) or from [here](http://dl.dropboxusercontent.com/u/4253254/resources/SNP6/GenomeWideSNP_6.Full.cdf)
+
+---
 
 ##Usage
 
 ###1. Extract all probes raw intensities 
 
+<<<<<<< HEAD
 Extracts all the raw probe intensities for probes on the array. Each array has multiple identical probes against the same sequence, physically distributed across array (to adjust for potential area specific artefacts). This script extracts all those intensities.
    
        optional arguments:
@@ -21,6 +26,15 @@ Extracts all the raw probe intensities for probes on the array. Each array has m
                         directory containing apt-cel-extract binary
       -d CDFFILE, --CDFfile CDFFILE
                         full path to CDF file for AffySNP6 chip
+=======
+optional arguments:
+  -h, --help            show this help message and exit
+
+required arguments:  
+     --CELdir : full path to directory containing CEL files  
+     --aptdir : full path to directory containing apt-cel-extract binary  
+     --CDFfile : full path to CDF file for AffySNP6 chip  
+>>>>>>> d41dd2690c557d90d49fe8d0f6b32ad511dfff7f
 
 **Notes:**  
 Make sure all your CEL file extensions are in UPPERCASE
@@ -44,6 +58,7 @@ R library dependencies:
 **Output**: tab delimited file containing data for ALL sample in the CEL file directory. Column headings are taken from the full filenames. Rownames are from probeIDs (separate probeIDs for each allele). Located in the original CEL file directory.
 
 
+<<<<<<< HEAD
 ###3. Normalize Arrays
 
 In basic terms, separate the probesets into those with a MSRE site (MPRs) and those without (MNRs). Quantile normalize the MNRs (using a HapMap sample as a model distribution) and then use those to interpolate the intensity values of the MPRs (based on which MNR they were closest to before quantile normalizing the MNRs).
@@ -74,17 +89,17 @@ b)  the log2(A/B) probe intensity ratios for all heterozygote genotypes for each
   
 
 ##Note
+=======
+---
+
+##Notes
+>>>>>>> d41dd2690c557d90d49fe8d0f6b32ad511dfff7f
 
 This is a work in progress. 
+
 
 The initial R methods using aroma.affymetrix are too slow. Replaced them with the affy power tools to extract initial intensities and then median summarize in R.
 
 In the interest of time, rather than make an integrated program, I've split up the steps into individual scripts.
  
 Next steps are to properly integrate the quantile normalization steps.
-
-
-
-
-
-Currently very slow, with the main slowdown happening at the reformat of the data structure after extracting the raw intensities. 
