@@ -3,7 +3,22 @@
 # 2 - name of the file with the quantile normalized data
 # 3 - name of the file with the adjustment factors
 
-library(affy)	#load the library that does the quantile norm calcs
+
+## ----functions-----------------------------------------------------------
+# tests if library installed: if yes, loads library; if no, installs library
+pkgTest <- function(x)  {
+    if (!require(x,character.only = TRUE))
+    {
+      install.packages(x,dep=TRUE, repo="http://lib.stat.cmu.edu/R/CRAN/" )
+
+        if(!require(x,character.only = TRUE)) stop("Package not found")
+    }
+  }
+
+
+## ----libraries-----------------------------------------------------------
+pkgTest("preprocessCore")
+library(preprocessCore)	#load the library that does the quantile norm calcs
 args<-commandArgs() #load command line arguments into variable
 
 #read in the data, grab the header separately and stow in a variable for now

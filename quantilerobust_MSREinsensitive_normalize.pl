@@ -1,4 +1,3 @@
-#last modified - April-15-2009
 #takes 3 arguments
 #1 - name of file with the data
 #2 - name of file with the UNCUTSNP sets (probe_ids)
@@ -8,6 +7,41 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
+
+my $help;
+my $datafile='';
+my $mnrfile='';
+my $mprfile='';
+my $modelfile='';
+
+GetOptions(
+  'datafile|i=s' => \$datafile,
+  'mnrfile|u=s' => \$mnrfile,
+  'mprfile|c=s' => \$mprfile,
+  'modelfile|m=s' => \$modelfile,
+  'help|h' => \&usage);
+
+
+# usage() if ( @ARGV < 1 or $help eq 1);
+
+if (defined $datafile && $datafile eq '') {
+print("raw intensity datafile not defined\nUse --datafile/-i\n");
+die;
+}
+if (defined $mnrfile && $mnrfile eq '') {
+print("MNR probe id file not defined\nUse --mnrfile/-u\n");
+die;
+}
+if (defined $mprfile && $mprfile eq '') {
+print("MPR probe id file not defined\nUse --mprfile/-c/\n");
+die;
+}
+if (defined $modelfile && $modelfile eq '') {
+print("model sample raw intensity file not defined\nUse --modelfile/-m\n");
+die;
+}
+
 ##filenames
 my $rawuncutdata = "rawUNCUT.txt";
 my $rawcutdata = "rawCUT.txt";
@@ -16,11 +50,10 @@ my $adjustdata = "quant-rawUNCUTadjustments.txt";
 my $temp = "tempfile.txt";
 
 
-
 #open model file and combine with datafile
 #open model file, read into hash with probeid as key
-open (MODEL, $ARGV[3]);
-my ($probeid, $data, $modelcolheader,$line);
+open (MODEL, $modelfile);
+my ($probeid, $data, $modelcolheader, $line);
 my $modelheader =<MODEL>;
 my %model;
 while (<MODEL>) {
@@ -31,7 +64,7 @@ chomp;
 close MODEL;
 
 #open data file, read into hash with probeid as key
-open (ALLRAW, $ARGV[0]);
+open (ALLRAW, $datafile);
 my $dataheader=<ALLRAW>;
 chomp($dataheader);
 my %allraw;
@@ -58,11 +91,9 @@ print TEMP $allraw{$value}."\t".$model{$value}."\n";
 close TEMP;
 
 
-
-
  #extract UNCUT SNP data from temp datafile
  open (TEMP, "<$temp");
- open (UNCUTSNPS, $ARGV[1]);
+ open (UNCUTSNPS, $mnrfile);
  open (RAWUNCUT, ">$rawuncutdata");
  pullsnps (*TEMP, *UNCUTSNPS, *RAWUNCUT);
  close UNCUTSNPS;
@@ -71,7 +102,7 @@ close TEMP;
 print "UNCUTSNP data extracted\n";
 #extract CUT SNP data from datafile)
 open (TEMP, "<$temp");
-open (CUTSNPS, $ARGV[2]);
+open (CUTSNPS, $mprfile);
 open (RAWCUT, ">$rawcutdata");
 pullsnps (*TEMP, *CUTSNPS, *RAWCUT);
 close CUTSNPS;
@@ -79,17 +110,13 @@ close RAWCUT;
 close TEMP;
 print "CUTSNP data extracted\n";
 
-
-
 #run R quantile normalization in R on rawUNCUTdata and ouput both the 
 # quantile normalized UNCUTdata results as well as the adjustments
 open (QUANTUNCUT, ">$quantuncutdata");
 open (ADJUSTS, ">$adjustdata");
-system ("R --no-save < /fg/autosome/John/Scripts/Rquantilenorm.robust.R $rawuncutdata $quantuncutdata $adjustdata");
+system ("R --no-save < ./bin/Rquantilenorm.robust.R $rawuncutdata $quantuncutdata $adjustdata");
 close QUANTUNCUT;
 close ADJUSTS;
-
-
 
 #open a data file to grab the header ($header) and count the number of cel files you are analysing ($numdatafields)
 open (RAWCUT, "<$rawcutdata");
@@ -282,3 +309,9 @@ sub pullsnps {
     }
     close $snps;
   }
+
+sub usage {
+  print "Unknown option: @_\n" if ( @_ );
+  print "usage: program [--datafile/-i absolute path to datafile] [--mnrfile/u absolute path to MNR probeid file] [--mprfile/c absolute path to MPR probeid file] [--modelfile/m absolute path to HapMap-derived model raw data file]  [--help|-h]\n";
+  exit;
+}
