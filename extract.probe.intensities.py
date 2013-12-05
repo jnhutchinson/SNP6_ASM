@@ -21,16 +21,3 @@ os.chdir(args.CELdir)
 for files in glob.glob("*.CEL"):
     outputfile=re.sub("CEL$", "rawints.txt", files )
     subprocess.call([aptcelextract, files, '-o', outputfile, '-d', args.CDFfile ])
-
-mediansummarize=os.path.join(args.aptdir, "Extract_raw_intensities.R")
-print(mediansummarize)
-subprocess.call(["Rscript", mediansummarize, args.CELdir])
-
-
-
-
-
-
-
-
-
