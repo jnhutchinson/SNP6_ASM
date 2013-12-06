@@ -46,6 +46,7 @@ medints.l <- llply(rawintFiles, function(rawintFile) {
   rawints <- aggregate(rawints[,intCol], by=list(probeset_id=rawints$probeset_id, alleleID=rawints$block), median)
   return(rawints)
 })
+head(medints.l[[1]])
 print("data imported")
 names(medints.l) <- sub(".rawints.txt", "", rawintFiles)
 
