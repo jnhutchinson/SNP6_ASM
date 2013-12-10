@@ -17,7 +17,16 @@ aptcelextract=os.path.join(args.aptdir, "apt-cel-extract" )
 # switch to the directory with the CEL files
 os.chdir(args.CELdir)
 
+
 # process all CEL files in directory one by one
+
+reps = {'CEL':'rawints.txt', '-':'_'}
+
+def replace_all(text, dic):
+    for i, j in dic.iteritems():
+        text = text.replace(i, j)
+    return text
+
 for files in glob.glob("*.CEL"):
-    outputfile=re.sub("CEL$", "rawints.txt", files )
-    subprocess.call([aptcelextract, files, '-o', outputfile, '-d', args.CDFfile ])
+    	outputfile=replace_all(files, reps)
+    	subprocess.call([aptcelextract, files, '-o', outputfile, '-d', args.CDFfile ])
